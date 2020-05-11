@@ -10,4 +10,4 @@ describe("GET /", () => {
         expect(res.body.message).toBe("API up")
       })
   })
-})
+});
