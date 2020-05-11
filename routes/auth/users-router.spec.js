@@ -41,8 +41,8 @@ describe("The /login route", () => {
   }
 
   // Set up the JWTs 
-  beforeEach(() => {
-    const users = db("users").where({ username: userLogin.username });
+  beforeEach(async() => {
+    const users = await db("users").where({ username: userLogin.username });
     if (!users.includes(userLogin.username)) {
       request(router).post("/register")
         .send({ username: user.login, password: defaultPW })
