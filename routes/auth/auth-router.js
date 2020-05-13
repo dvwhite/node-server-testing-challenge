@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const router = express.Router({ mergeParams: true });
 
 // Subroute for /users
-const userRoute = require("./../users/users-router");
 const restricted = require("./restricted-middleware");
-router.use("/users", restricted(), userRoute);
+// const userRoute = require("./../users/users-router");
+// router.use("/users", userRoute);
 
 // Db helper fns
 const { findBy, insert } = require("./../users/users-model");
@@ -26,70 +26,6 @@ router.post("/register", async (req, res) => {
     errDetail(res, err);
   }
 });
-
-router.post("/login", validateUsername, async (req, res) => {
-  const authError = {
-    message: "Invalid Credentials",
-    validation: [],
-    data: {},
-  };
-
-  try {
-    const { username, password } = req.body;
-    const user = await findBy({ username });
-
-    // Auth in
-    const authenticated = bcrypt.compareSync(password, user.password);
-    if (!authenticated) {
-      return res.status(401).json(authError);
-    }
-    delete user.password; // This is no longer needed
-    
-    // Create the JWT token
-    const payload = {
-      userId: user.id,
-      userRole: user.role_id
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET);
-
-    // Send the data back, including the token
-    res.status(200).json({
-      message: `Welcome, ${user.username}!`,
-      validation: [],
-      data: {
-        user,
-        token
-      }
-    });
-
-  } catch (err) {
-    errDetail(res, err);
-  }
-});
-
-/**
- * @function validateUsername: Validate the the id exists before submitting req
- * @param {*} req: The request object sent to the API
- * @param {*} res: The response object sent from the API
- * @param {*} next: The express middleware function to move to the next middleware
- * @returns: none
- */
-async function validateUsername(req, res, next) {
-  try {
-    const { username } = req.body;
-    const user = await findBy({ username });
-    if (!user) {
-      return res.status(404).json({
-        message: "Not Found",
-        validation: ["Username doesn't exist"],
-        data: {},
-      });
-    }
-    next();
-  } catch (err) {
-    errDetail(res, err);
-  }
-}
 
 function errDetail(res, err) {
   console.log(err);
