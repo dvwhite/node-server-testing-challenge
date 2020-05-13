@@ -77,9 +77,9 @@ describe("the users model", () => {
 
     try {
       const user = await insert(userLogin);
-      expect(user.name).toBe("test User");
+      expect(user.username).toBe("test User");
       expect(user.password).toBe(hash1);
-      expect(user.role).toBe("1");
+      expect(user.role).toBe(1);
       done();
     } catch (err) {
       console.log(err);
@@ -87,18 +87,18 @@ describe("the users model", () => {
     }
   });
 
-  // it("should authenticate without crashing", async () => {
-  //   // Ensure users have been truncated properly
-  //   dbHasTruncated();
+  it("should authenticate without crashing", async () => {
+    // Ensure users have been truncated properly
+    dbHasTruncated();
 
-  //   try {
-  //     const user = await insert(userLogin);
-  //     expect(user.name).toBe("test User");
-  //     expect(user.password).toBe(hash1);
-  //     expect(user.role).toBe("1");
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // });
+    try {
+      const user = await insert(userLogin);
+      expect(user.username).toBe("test User");
+      expect(user.password).toBe(hash1);
+      expect(user.role).toBe(1);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 });
 
