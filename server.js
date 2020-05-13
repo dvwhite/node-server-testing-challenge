@@ -26,7 +26,7 @@ server.use((err, req, res, next) => {
 });
 
 server.get("/", (req, res) => {
-  res.status(200).json({ message: "API up", validation: [], data: {} });
+  return res.status(200).json({ message: "API up", validation: [], data: {} });
 });
 
 module.exports = server;

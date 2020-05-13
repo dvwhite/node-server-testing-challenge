@@ -11,9 +11,9 @@ module.exports = {
 
 function find() {
   return db("users")
-    .then(users => {
-      return users.map(user => sanitizeUser(user))
-    });
+    // .then(users => {
+    //   return users.map(user => sanitizeUser(user))
+    // });
 };
 
 function findBy(field) {
@@ -26,7 +26,8 @@ function insert(user) {
   return db("users")
     .insert(user)
     .then(async ids => {
-      const user = await findBy("id", ids[0]);
-      return sanitizeUser(user);
+      const user = await findBy({ id: ids[0] });
+      return user
+      // return sanitizeUser(user);
     });
 };
