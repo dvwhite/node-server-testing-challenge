@@ -37,6 +37,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
+    "leaked-handles": "^5.2.0",
     "path": "^0.12.7",
     "sqlite3": "^4.2.0"
   }
