@@ -5,6 +5,7 @@ const server = express();
 const cors = require("cors");
 const helmet = require("helmet");
 const authRoute = require("./routes/auth/auth-router");
+const errorHandler = require("./middleware/error-middleware");
 
 server.use(helmet());
 server.use(express.json());
@@ -14,16 +15,7 @@ server.use(cors());
 server.use("/api", authRoute);
 
 // Error middleware
-server.use((err, req, res, next) => {
-  console.log(err);
-  if (err) {
-    return res.status(500).json({
-      message: "There was an error performing the required operation",
-      validation: [],
-      data: {},
-    });
-  }
-});
+server.use(errorHandler);
 
 server.get("/", (req, res) => {
   return res.status(200).json({ message: "API up", validation: [], data: {} });
