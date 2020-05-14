@@ -62,7 +62,8 @@ describe("GET /", () => {
 
   it("returns a 500 status code when there's an error", async (done) => {
     errorHandler(errorObj, req, res, next);
-    expect(500).toBe(500);
+    expect(res.code).toBe(500);
+    expect(res.code).not.toBe(200)
     done();
   });
 });
