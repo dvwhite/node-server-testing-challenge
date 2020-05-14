@@ -1,5 +1,10 @@
-const server = require("./server");
+const server = require("../server");
 const request = require("supertest");
+const db = require("./../data/dbConfig");
+
+afterAll(async () => {
+  await db.destroy();
+})
 
 describe("GET /", () => {
   it("returns a 200 status code", () => {

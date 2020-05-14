@@ -1,8 +1,8 @@
 const bcrypt = require("bcryptjs");
 
 // Db helpers
-const db = require("../../data/dbConfig");
-const { find, findBy, insert } = require("../users/users-model");
+const db = require("../data/dbConfig");
+const { find, findBy, insert } = require("../routes/users/users-model");
 
 // Test helpers
 const dbHasTruncated = async () => {
@@ -46,30 +46,36 @@ describe("the users model", () => {
         done(err);
       }
   });
-  
-  it("should register a user", async done => {
+
+  afterAll(async done => {
+    try {
+      await db.destroy();
+      done()
+    } catch (err) {
+      console.log("Unable to close the database connection", err)
+      done(err)
+    }
+  });
+
+  it("should find all users", async done => {
     // Ensure users have been truncated properly
     const truncated = await dbHasTruncated();
     expect(truncated).toBe(true);
 
     try {
-      await insert(userLogin)
+      let users = await find();
+      expect(users).toHaveLength(0);
+      await insert(userLogin);
+      users = await find(); // add a user
+      expect(users).not.toHaveLength(0);
+      expect(users).toHaveLength(1);
       done();
     } catch (err) {
       console.log(err);
       done(err);
     }
-
-    try {
-      const updatedUsers = await find();
-      expect(updatedUsers).toHaveLength(1);
-      done();
-    } catch (err) {
-      console.log(err);
-      done(err);
-    }
-  });
-
+  })
+  
   it("should insert the provided user into the db", async done => {
     // Ensure users have been truncated properly
     const truncated = await dbHasTruncated();
@@ -78,7 +84,7 @@ describe("the users model", () => {
     try {
       const user = await insert(userLogin);
       expect(user.username).toBe("test User");
-      expect(user.password).toBe(hash1);
+      expect(user.password).not.toBe(hash1);
       expect(user.role).toBe(1);
       done();
     } catch (err) {
@@ -87,17 +93,30 @@ describe("the users model", () => {
     }
   });
 
-  it("should authenticate without crashing", async () => {
+  it("should find a user by a provided username", async done => {
     // Ensure users have been truncated properly
-    dbHasTruncated();
+    const truncated = await dbHasTruncated();
+    expect(truncated).toBe(true);
 
     try {
       const user = await insert(userLogin);
       expect(user.username).toBe("test User");
-      expect(user.password).toBe(hash1);
+      expect(user.password).not.toBe(hash1); // sanitizeUser should get rid of this
       expect(user.role).toBe(1);
+      done();
     } catch (err) {
       console.log(err);
+      done(err);
+    }
+
+    try {
+      const user = await findBy({ username: userLogin.username})
+      expect(user.username).toBe("test User");
+      expect(user.password).toBe(hash1) // can't use sanitizeUser with findBy
+      expect(user.role).toBe(1);
+      done();
+    } catch (err) {
+      done(err);
     }
   });
 });
