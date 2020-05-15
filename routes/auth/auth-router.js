@@ -12,15 +12,12 @@ const restricted = require("./restricted-middleware");
 const { findBy, insert } = require("./../users/users-model");
 
 router.post("/register", async (req, res) => {
-  if (!req.body) {
-    console.log("Error: req.body is undefined")
-  }
   try {
     const user = req.body;
     const hash = bcrypt.hashSync(req.body.password, Number(process.env.HASHES));
     user.password = hash;
     const newUser = await insert(user);
-    res.status(200).json({
+    res.status(201).json({
       message: `Registered ${newUser.username} successfully`,
       validation: [],
       data: newUser,

@@ -1,4 +1,4 @@
-const router = require("../routes/auth/auth-router");
+const server = require("../server");
 const request = require("supertest");
 const db = require("./../data/dbConfig");
 const bcrypt = require("bcryptjs");
@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 
 // Test helpers
 const dbHasTruncated = async () => {
+  // Verifies that the database has truncated
   try {
     const users = await find();
     return (users && users.length ? false : true);
@@ -13,6 +14,12 @@ const dbHasTruncated = async () => {
     console.log(err);
     return false;
   }
+}
+
+const verifyProperties = (obj, props) => {
+  // Verifies that the object has the required properties
+  objKeys = Object.keys(obj);
+  return props.every(key => objKeys.includes(key));
 }
 
 // Db helpers
@@ -43,10 +50,13 @@ describe("/register", () => {
     // Ensure users have been truncated properly
     const truncated = await dbHasTruncated();
     expect(truncated).toBe(true);
-
-    const res = await request(router).post("/register", testUser)
-    console.log(res);
-    
+    // Test the endpoint
+    const res = await request(server).post("/api/register").send(testUser)
+    expect(res.statusCode).toBe(201);
+    expect(res.type).toBe("application/json");
+    expect(verifyProperties(res.body.data, ["username", "role"])).toBe(true);
+    expect(res.body.data.username).toBe(testUser.username);
+    expect(res.body.data.role).toBe(testUser.role);
   });
 
   afterAll(async done => {
