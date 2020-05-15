@@ -35,6 +35,7 @@ router.post("/login", validateUsername, async (req, res) => {
   };
 
   try {
+    // Retrieve the user from the dbase
     const { username, password } = req.body;
     const user = await findBy({ username });
 
@@ -51,9 +52,9 @@ router.post("/login", validateUsername, async (req, res) => {
     
     // Create the JWT token
     const payload = {
-      userId: user.id,
-      userRole: user.role_id,
-      userDepartment: user.department
+      id: user.id,
+      role: user.role,
+      department: user.department
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '120m' });
     res.cookie("token", token);
@@ -67,7 +68,6 @@ router.post("/login", validateUsername, async (req, res) => {
         token
       }
     });
-
   } catch (err) {
     errDetail(res, err);
   }
