@@ -5,7 +5,7 @@ const db = require("./../data/dbConfig");
 // Middleware imports
 const errorHandler = require("../middleware/error-middleware");
 
-const errorObj = {
+const testError = {
   Test: {
     name: 'Trip the error middleware',
     desc: 'Test of the error middleware, seeing this is intentional'
@@ -13,33 +13,29 @@ const errorObj = {
 };
 
 describe("GET /", () => {
-  // Mocked req, res Express objects
+  // Mocked req, res, next Express objects/functions
   let req, res;
-  // Mocked Express next() function
   const next = jest.fn();
 
   beforeEach(() => {
     req = {
+      cookies: {},
+      query: {},
       params: {},
       body: {},
     };
 
     res = {
-      data: null,
+      data: {},
       code: null,
       status(status) {
-        this.code = status;
+        this.type = status;
         return this;
-      },
-      send(payload) {
-        this.data = payload;
       },
       json(payload) {
         this.data = JSON.stringify(payload);
       },
     };
-
-    next.mockClear();
   });
 
   afterAll(async () => {
@@ -61,9 +57,9 @@ describe("GET /", () => {
   });
 
   it("returns a 500 status code when there's an error", async (done) => {
-    errorHandler(errorObj, req, res, next);
-    expect(res.code).toBe(500);
-    expect(res.code).not.toBe(200)
+    errorHandler(testError, req, res, next);
+    expect(res.type).toBe(500);
+    expect(res.type).not.toBe(200)
     done();
   });
 });

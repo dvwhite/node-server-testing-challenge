@@ -5,13 +5,14 @@ const router = express.Router({ mergeParams: true });
 
 // Subroute for /users
 const restricted = require("./restricted-middleware");
-// const userRoute = require("./../users/users-router");
+// const userRoute = require("../users/users-router");
 // router.use("/users", userRoute);
 
 // Db helper fns
 const { findBy, insert } = require("./../users/users-model");
 
 router.post("/register", async (req, res) => {
+  console.log(Object.keys(req))
   try {
     const user = req.body;
     const hash = bcrypt.hashSync(req.body.password, Number(process.env.HASHES));

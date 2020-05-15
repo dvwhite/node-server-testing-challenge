@@ -25,12 +25,12 @@ const hash2 = bcrypt.hashSync(defaultPW, Number(process.env.HASHES));
 const userLogin = {
   username: "test User",
   password: hash1,
-  role: "1",
+  role: 1,
 };
 const adminLogin = {
   username: "test Admin",
   password: hash2,
-  role: "2",
+  role: 2,
 };
 
 // Tests
