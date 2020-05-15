@@ -4,6 +4,20 @@ const db = require("./../data/dbConfig");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Test helpers
+const dbHasTruncated = async () => {
+  try {
+    const users = await find();
+    return (users && users.length ? false : true);
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+// Db helpers
+const { find } = require("../routes/users/users-model");
+
 // Test user credentials
 const defaultPW = "123456";
 const hash = bcrypt.hashSync(defaultPW, Number(process.env.HASHES));
@@ -25,13 +39,14 @@ describe("/register", () => {
     }
   });
 
-  it("inserts a new user into the db with /register", (done) => {
-    request(router)
-      .post("/register")
-      .send(testUser)
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200, done);
+  it("inserts a new user into the db with /register", async () => {
+    // Ensure users have been truncated properly
+    const truncated = await dbHasTruncated();
+    expect(truncated).toBe(true);
+
+    const res = await request(router).post("/register", testUser)
+    console.log(res);
+    
   });
 
   afterAll(async done => {
