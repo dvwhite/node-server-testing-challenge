@@ -5,8 +5,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Test helpers
-const dbHasTruncated = async () => {
-  // Verifies that the database has truncated
+const dbHasNoUsers = async () => {
+  // Verifies that the database has noUsers
   try {
     const users = await find();
     return users && users.length ? false : true;
@@ -60,8 +60,8 @@ describe("/register", () => {
 
   it("inserts a new user into the db", async () => {
     // Ensure users have been truncated properly
-    const truncated = await dbHasTruncated();
-    expect(truncated).toBe(true);
+    const noUsers = await dbHasNoUsers();
+    expect(noUsers).toBe(true);
     // Test the endpoint
     const res = await request(server).post("/api/register").send(testUser);
     expect(res.statusCode).toBe(201);
@@ -73,17 +73,20 @@ describe("/register", () => {
 
   it("doesn't insert an existing user into the database", async done => {
     // Ensure users have been truncated properly
-    let truncated = await dbHasTruncated();
-    expect(truncated).toBe(true);
-    // Test the endpoint
+    let noUsers = await dbHasNoUsers();
+    expect(noUsers).toBe(true);
+    // Test the endpoint by registering a user
     const res = await request(server).post("/api/register").send(testUser);
-    truncated = await dbHasTruncated();
-    expect(truncated).toBe(false);
+    noUsers = await dbHasNoUsers();
+    expect(noUsers).toBe(false);
     try {
+      // Register a second user without truncating the dbase
       const res = await request(server).post("/api/register").send(testUser);
+      // It should throw an error
       expect(res.statusCode).toBe(500);
       expect(res.type).toBe("application/json");
       expect(JSON.parse(res.text)).toEqual(serverError);
+      // There should still only be 1 user in the dbase
       const users = await find();
       expect(users).toHaveLength(1);
       done();
