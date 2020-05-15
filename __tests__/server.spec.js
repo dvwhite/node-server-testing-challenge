@@ -27,9 +27,9 @@ describe("GET /", () => {
 
     res = {
       data: {},
-      code: null,
-      status(status) {
-        this.type = status;
+      statusCode: null,
+      status(statusCode) {
+        this.statusCode = statusCode;
         return this;
       },
       json(payload) {
@@ -58,8 +58,8 @@ describe("GET /", () => {
 
   it("returns a 500 status code when there's an error", async (done) => {
     errorHandler(testError, req, res, next);
-    expect(res.type).toBe(500);
-    expect(res.type).not.toBe(200)
+    expect(res.statusCode).toBe(500);
+    expect(res.statusCode).not.toBe(200)
     done();
   });
 });
